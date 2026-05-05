@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+logs/
+*.csv
+*.parquet
+.idea/
+.DS_Store
+pgdata/
+grafana_data/
