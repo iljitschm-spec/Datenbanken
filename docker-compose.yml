@@ -1,0 +1,121 @@
+version: '3.8'
+
+services:
+
+  # === DATENBANK ===
+  # TimescaleDB = PostgreSQL + optimiert fuer Zeitreihen
+  # Fuehrt init_db.sql beim allerersten Start automatisch aus
+  postgres:
+    image: timescale/timescaledb:latest-pg16
+    container_name: wetter_strom_db
+    environment:
+      POSTGRES_USER: pipeline
+      POSTGRES_PASSWORD: pipeline123
+      POSTGRES_DB: wetter_strom
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pipeline -d wetter_strom"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # === AIRFLOW INIT ===
+  # Laeuft nur EINMAL beim ersten Start:
+  # - Erstellt Airflow-interne Tabellen in der DB
+  # - Legt den Admin-User an (admin/admin)
+  # - Beendet sich danach automatisch
+  airflow-init:
+    image: apache/airflow:2.9.1-python3.11
+    container_name: airflow_init
+    environment: &airflow-env
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://pipeline:pipeline123@postgres:5432/wetter_strom
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__WEBSERVER__SECRET_KEY: 'supersecretkey123'
+      PYTHONPATH: /opt/airflow
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes: &airflow-volumes
+      - ./dags:/opt/airflow/dags
+      - ./ingestion:/opt/airflow/ingestion
+      - ./logs:/opt/airflow/logs
+      - ./requirements.txt:/requirements.txt
+    command: >
+      bash -c "
+        pip install -r /requirements.txt &&
+        airflow db migrate &&
+        airflow users create
+          --username admin
+          --password admin
+          --firstname Admin
+          --lastname User
+          --role Admin
+          --email admin@example.com || true
+      "
+
+  # === AIRFLOW WEBSERVER ===
+  # Web-Oberflaeche auf http://localhost:8080
+  # Hier seht ihr eure DAGs, koennt sie triggern
+  # und die Logs einsehen
+  airflow-webserver:
+    image: apache/airflow:2.9.1-python3.11
+    container_name: airflow_webserver
+    environment: *airflow-env
+    volumes: *airflow-volumes
+    ports:
+      - "8080:8080"
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+    command: >
+      bash -c "
+        pip install -r /requirements.txt &&
+        airflow webserver
+      "
+    restart: unless-stopped
+
+  # === AIRFLOW SCHEDULER ===
+  # Fuehrt DAGs aus. Dient auch als Python-Umgebung
+  # in der ihr Skripte direkt ausfuehren koennt:
+  #   docker exec -it airflow_scheduler python /opt/airflow/ingestion/smard_client.py
+  airflow-scheduler:
+    image: apache/airflow:2.9.1-python3.11
+    container_name: airflow_scheduler
+    environment: *airflow-env
+    volumes: *airflow-volumes
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+    command: >
+      bash -c "
+        pip install -r /requirements.txt &&
+        airflow scheduler
+      "
+    restart: unless-stopped
+
+  # === GRAFANA ===
+  # Dashboard-Tool auf http://localhost:3000
+  # Wird in Woche 4 fuer Visualisierungen genutzt
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  grafana_data:
+
