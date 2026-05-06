@@ -25,7 +25,7 @@ DB_CONFIG_LOCAL = {
 
 # Jeder Energietraeger hat eine eigene Filter-ID bei SMARD
 SMARD_GENERATION_FILTERS = {
-    "biomass":         4169,
+    "biomass":         4066,
     "hydro":           1226,
     "wind_offshore":   1225,
     "wind_onshore":    4067,
@@ -37,6 +37,7 @@ SMARD_GENERATION_FILTERS = {
     "natural_gas":     4071,
     "pumped_storage":  4070,
     "other_conv":      1227,
+    "total_consumption" : 410,
 }
 
 # Preis-Filter: Day-Ahead Spotmarkt
@@ -75,6 +76,6 @@ WEATHER_REGIONS = [
 # === Zeitraum ===
 # 2 volle Jahre: genuegend fuer saisonale Muster
 # Train auf 2024, Test auf 2025
-DATE_START = "2024-01-01"
+DATE_START = "2020-01-01"
 DATE_END = "2025-12-31"
 
