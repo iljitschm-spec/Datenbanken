@@ -1,0 +1,15 @@
+name: 'wetter_strom'
+version: '1.0.0'
+config-version: 2
+profile: 'wetter_strom'
+model-paths: ["models"]
+
+models:
+  wetter_strom:
+    staging:
+      +materialized: view       # Views = kein eigener Speicher, immer aktuell
+      +schema: staging
+    marts:
+      +materialized: table      # Echte Tabellen = schnellere Abfragen
+      +schema: marts
+
