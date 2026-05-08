@@ -20,7 +20,7 @@ print(r.text)
 #Kontrollwerte für die Abfrage:
 start = datetime(2019, 12, 31, tzinfo = timezone.utc)
 end = datetime(2023, 1, 1, tzinfo = timezone.utc)
-filter_id = 1226
+filter_id = 4169
 
 timestamps = fetch_smard_timestamps(filter_id, resolution = "day")
 print("Yearly Resolution Timestamps")

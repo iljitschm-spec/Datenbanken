@@ -41,7 +41,7 @@ SMARD_GENERATION_FILTERS = {
 }
 
 # Preis-Filter: Day-Ahead Spotmarkt
-SMARD_PRICE_FILTER = 8004
+SMARD_PRICE_FILTER = 4169
 
 
 # === Open-Meteo API (Wetterdaten) ===

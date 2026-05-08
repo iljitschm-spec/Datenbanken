@@ -1,0 +1,14 @@
+wetter_strom:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: wetter_strom_db           # Docker-Containername
+      port: 5432
+      user: pipeline
+      password: pipeline123
+      dbname: wetter_strom
+      schema: public
+      threads: 4
+
+
