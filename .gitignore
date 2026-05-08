@@ -9,3 +9,4 @@ logs/
 .DS_Store
 pgdata/
 grafana_data/
+dbt_project/target/
