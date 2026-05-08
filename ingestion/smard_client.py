@@ -139,7 +139,7 @@ def fetch_prices_for_period(start_date, end_date, db_config):
     print(f"Hole SMARD-Preisdaten von {start_date} bis {end_date}...")
 
     try:
-        timestamps = fetch_smard_timestamps(8004)
+        timestamps = fetch_smard_timestamps(4169)
         relevant_ts = [
             ts for ts in timestamps
             if start_dt <= ms_to_datetime(ts) <= end_dt
@@ -151,7 +151,7 @@ def fetch_prices_for_period(start_date, end_date, db_config):
     rows = []
     for ts in relevant_ts:
         try:
-            series = fetch_smard_data(8004, ts)
+            series = fetch_smard_data(4169, ts)
             for point in series:
                 ts_ms, value = point[0], point[1]
                 dt = ms_to_datetime(ts_ms)
