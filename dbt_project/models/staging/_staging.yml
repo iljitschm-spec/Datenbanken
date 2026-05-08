@@ -1,0 +1,42 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: weather_hourly
+        columns:
+          - name: timestamp
+            tests:
+              - not_null
+          - name: region_name
+            tests:
+              - not_null
+      - name: smard_generation
+        columns:
+          - name: timestamp
+            tests:
+              - not_null
+      - name: smard_prices
+        columns:
+          - name: timestamp
+            tests:
+              - not_null
+
+models:
+  - name: stg_weather_hourly
+    description: "Bereinigte stuendliche Wetterdaten pro Region"
+    columns:
+      - name: timestamp
+        tests:
+          - not_null
+      - name: region_name
+        tests:
+          - not_null
+
+  - name: stg_smard_generation
+    description: "Bereinigte SMARD-Erzeugungsdaten"
+
+  - name: stg_smard_prices
+    description: "Bereinigte SMARD-Preisdaten"
+

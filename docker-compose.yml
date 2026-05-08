@@ -114,7 +114,17 @@ services:
       postgres:
         condition: service_healthy
     restart: unless-stopped
-
+    
+  dbt:
+    image: ghcr.io/dbt-labs/dbt-postgres:1.7.4
+    container_name: dbt
+    volumes:
+      - ./dbt_project:/usr/app        # euer dbt-Projekt
+      - ./dbt_project/profiles.yml:/root/.dbt/profiles.yml
+    depends_on:
+      - postgres      
+    working_dir: /usr/app
+    entrypoint: ["tail", "-f", "/dev/null"]   # Container laeuft dauerhaft
 
 volumes:
   pgdata:
