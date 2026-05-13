@@ -41,3 +41,6 @@ FROM weather w
 LEFT JOIN generation g ON w.timestamp = g.timestamp_hour
 LEFT JOIN prices p     ON w.timestamp = p.timestamp_hour
 
+WHERE w.timestamp >= '2020-01-06 00:00:00+00'
+  AND g.timestamp_hour IS NOT NULL
+  AND p.timestamp_hour IS NOT NULL
